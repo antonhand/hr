@@ -1,0 +1,44 @@
+INSERT INTO Education VALUES (1, 'Нет');
+INSERT INTO Education VALUES (2, 'Среднее общее');
+INSERT INTO Education VALUES (3, 'Среднее полное');
+INSERT INTO Education VALUES (4, 'Среднее специальное');
+INSERT INTO Education VALUES (5, 'Высшее');
+
+INSERT INTO Employee VALUES (1, 'Петров', 'Иван', 'Светозарович', 'Москва, ул. Лётчика Бабушкина, дом 1, корп. 3, кв. 14', 3);
+INSERT INTO Employee VALUES (2, 'Тевтонов', 'Данияр', 'Томасович', 'Москва, пр-д Шокальского, д. 15, корп. 1, кв. 54', 5);
+INSERT INTO Employee VALUES (3, 'Шульсман', 'Семён', 'Давидович', 'Москва, ул. Лётчика Бабушкина, дом 1, корп. 3, кв. 14', 4);
+INSERT INTO Employee VALUES (4, 'Налейко', 'Пётр', 'Андреевич', 'Москва, ул. Лётчика Бабушкина, дом 1, корп. 3, кв. 14', 2);
+INSERT INTO Employee VALUES (5, 'Джугашвили', 'Иосиф', 'Виссарионович', 'Москва, Красная пл., дом 1', 4);
+
+INSERT INTO Company VALUES (1, 'ПАО Газпром');
+INSERT INTO Company VALUES (2, 'ГБОУ Лицей № 1568');
+INSERT INTO Company VALUES (3, 'ООО Клевер');
+INSERT INTO Company VALUES (4, 'ЦК КПСС');
+INSERT INTO Company VALUES (5, 'ЦК ВКП(б)');
+INSERT INTO Company VALUES (6, 'Совнарком');
+
+INSERT INTO Job VALUES (1, 'Химик-консультант');
+INSERT INTO Job VALUES (2, 'Учитель информатики');
+INSERT INTO Job VALUES (3, 'Продавец-кассир');
+INSERT INTO Job VALUES (4, 'Генеральный секретарь');
+INSERT INTO Job VALUES (5, 'Химик-стажёр');
+INSERT INTO Job VALUES (6, 'Народный комиссар');
+
+INSERT INTO JobStory VALUES (1, 1, 5, 40000, '2016-02-13', NULL);
+INSERT INTO JobStory VALUES (5, 6, 6, 3000, '1917-11-08', '1923-07-07');
+INSERT INTO JobStory VALUES (5, 5, 4, 5000, '1922-04-03', '1952-10-15');
+
+INSERT INTO JobHunt VALUES (1, 1, 80000, 100000);
+INSERT INTO JobHunt VALUES (2, 2, 50000, 70000);
+INSERT INTO JobHunt VALUES (3, 3, 40000, 60000);
+INSERT INTO JobHunt VALUES (4, 3, 35000, 50000);
+INSERT INTO JobHunt VALUES (5, 4, NULL, NULL);
+
+INSERT INTO Vacancy VALUES (1, 1, 1, 95000, 5);
+INSERT INTO Vacancy VALUES (2, 2, 2, 50000, 5);
+INSERT INTO Vacancy VALUES (3, 3, 3, 37000, 2);
+INSERT INTO Vacancy VALUES (4, 4, 4, 5000, 3);
+
+INSERT INTO VacancyReq VALUES (1, 5, 6);
+INSERT INTO VacancyReq VALUES (2, 2, 18);
+INSERT INTO VacancyReq VALUES (4, 6, 12);

@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<project name="hr" basedir="." default="setupDB">
+	
+	<property name="name" value="hr"/>
+	<property name="war.dir" value="war"/>
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value=".classes"/>
+	<property name="docs.dir" value="${war.dir}/docs"/>
+	<property name="webclasses.dir" value="${war.dir}/WEB-INF/classes"/>
+	<property name="weblib.dir" value="${war.dir}/WEB-INF/lib"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="db.dir" value="db"/>
+	<property file="build.properties"/>
+	
+	<property name="testsrc.dir" value="test"/>
+	<property name="testbuild.dir" value=".testclasses"/>
+	<property name="testreports.dir" value="testng-reports"/>
+	<property name="testhtml.dir" value="${testreports.dir}/html"/>
+	
+	<taskdef name="testng" classname="org.testng.TestNGAntTask">
+		<classpath location="${weblib.dir}/testng.jar" />
+	 </taskdef>
+	
+	<path id="master-classpath">
+		<fileset dir="${weblib.dir}">
+			<include name="aspectjweaver.jar"/>
+			<include name="hibernate3.jar"/>
+			<include name="persistence.jar"/>
+			<include name="servlet-api.jar"/>
+			<include name="commons-logging.jar"/>
+			<include name="toplink-essentials.jar"/>
+			<include name="*springframework*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="build-classpath">
+		<!-- Only link toplink-api.jar in for building -->
+		<fileset dir="${weblib.dir}">
+			<include name="toplink-api.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="test-classpath">
+		<fileset dir="${db.dir}">
+			<include name="mysql*.jar"/>
+		</fileset>
+		<fileset dir="${weblib.dir}">
+			<include name="aopalliance*.jar"/>
+			<include name="testng.jar"/>
+			<include name="jcommander.jar"/>
+			<include name="bsh-2.0b4.jar"/>
+			<include name="snakeyaml.jar"/>
+			<include name="commons*.jar"/>
+			<include name="antlr*.jar"/>
+			<include name="cglib*.jar"/>
+			<include name="dom4j*.jar"/>
+			<include name="ehcache*.jar"/>
+			<include name="hibernate-entitymanager.jar"/>
+			<include name="hibernate-annotations.jar"/>
+			<include name="hibernate-commons-annotations.jar"/>
+			<!-- jta.jar only needed for Hibernate -->
+			<include name="jta.jar"/>
+			<include name="javassist*.jar"/>
+			<include name="log4j*.jar"/>
+			<include name="openjpa*.jar"/>
+			<!-- Serp only needed for OpenJPA -->
+			<include name="serp*.jar"/>
+			<!-- SLF4J only needed for Hibernate -->
+			<include name="slf4j*.jar"/>
+            <include name="eclipselink.jar"/>
+			<include name="toplink-essentials.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="setupMYSQL" description="Set up MYSQL database properties">
+
+			<property name="db.driver" value="${mysql.driver}"/>
+			<property name="db.url" value="${mysql.url}"/>
+			<property name="db.user" value="${mysql.user}"/>
+			<property name="db.pw" value="${mysql.pw}"/>
+
+		</target>
+
+
+	<target name="setupDB" depends="setupMYSQL" description="Initialize the selected database">
+
+		<ant antfile="${db.dir}/build.xml"/>
+
+	</target>
+	
+	<target name="build" description="Compile main source tree java files into class files, generate jar files">
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${weblib.dir}"/>
+
+		<javac destdir="${build.dir}" source="1.5" target="1.5"
+				debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}"/>
+			<classpath refid="master-classpath"/>
+			<classpath refid="build-classpath"/>
+		</javac>
+
+		<copy todir="${webclasses.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="hibernate.cfg.xml"/>
+				<include name="*.hbm.xml"/>
+				<include name="hibernate.properties"/>
+			</fileset>
+		</copy>
+
+		<jar jarfile="${weblib.dir}/${name}-domain.jar" compress="true">
+			<fileset dir="${build.dir}">
+				<include name="${domain.classes}"/>
+			</fileset>
+		</jar>
+
+		<jar jarfile="${weblib.dir}/${name}.jar" compress="true">
+			<fileset dir="${build.dir}">
+				<include name="**/*"/>
+				<exclude name="${domain.classes}"/>
+			</fileset>
+		</jar>
+
+	</target>
+
+	<target name="tests" depends="build,setupDB" description="Run tests using initialized database">
+		
+
+		<delete dir="${testbuild.dir}"/>
+		<mkdir dir="${testbuild.dir}"/>
+		<delete dir="${testreports.dir}"/>
+		<mkdir dir="${testreports.dir}"/>
+		<delete dir="${testhtml.dir}"/>
+		<mkdir dir="${testhtml.dir}"/>
+
+		<javac includeantruntime="false" srcdir="${testsrc.dir}" destdir="${testbuild.dir}" debug="true" deprecation="true">
+			<classpath path="${build.dir}"/>
+			<classpath refid="master-classpath"/>
+			<classpath refid="test-classpath"/>
+		</javac>
+
+		<copy todir="${testbuild.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+			<fileset dir="${testsrc.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+		
+	
+
+		<testng outputDir="${testreports.dir}"
+			haltOnFailure="no">
+			<classpath refid="master-classpath"/>
+			<classpath refid="test-classpath"/>
+			<classpath>
+		        <pathelement path="${build.dir}"/>
+		        <pathelement path="${testbuild.dir}"/>
+			 </classpath>
+			
+			<xmlfileset dir="." includes="testng.xml"/>
+		</testng>
+
+		<!-- restore the database -->
+		<ant antfile="${db.dir}/build.xml"/>
+		
+
+	</target>
+	
+	<target name="warfile" depends="build" description="Build the web application archive">
+
+		<mkdir dir="${dist.dir}"/>
+
+		<war warfile="${dist.dir}/${name}.war" basedir="${war.dir}" webxml="${war.dir}/WEB-INF/web.xml">
+			<include name="*"/>
+			<include name="docs/**"/>
+			<include name="html/**"/>
+			<include name="styles/**"/>
+			<include name="images/**"/>
+			<include name="WEB-INF/*.*"/>
+			<exclude name="WEB-INF/web.xml"/>
+			<include name="WEB-INF/classes/*.*"/>
+			<include name="WEB-INF/lib/**"/>
+			<include name="WEB-INF/jsp/**"/>
+			<include name="WEB-INF/classes/META-INF/*"/>
+			<include name="META-INF/*"/>
+			<exclude name="**/.*"/>
+			<exclude name="WEB-INF/geronimo-web.xml"/>
+		</war>
+
+	</target>
+	
+	<target name="deploywar" depends="warfile" description="Deploy application as a WAR file">
+        <copy todir="${deploy.path}" preservelastmodified="true">
+            <fileset dir="${dist.dir}">
+                <include name="*.war"/>
+            </fileset>
+        </copy>
+    </target>
+</project>

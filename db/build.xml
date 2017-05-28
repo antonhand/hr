@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<project name="setupDB" basedir="." default="all">
+
+	<target name="dropMYSQLTables">
+		<echo message="Dropping tables using: ${db.driver} ${db.url}" />
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pw}" onerror="continue">
+			<classpath>
+				<fileset dir="${db.dir}">
+					<include name="mysql*.jar" />
+				</fileset>
+			</classpath>
+			<transaction src="${db.dir}/dropTables.txt" />
+		</sql>
+	</target>
+
+	<target name="createMYSQLTables">
+		<echo message="Creating tables using: ${db.driver} ${db.url}" />
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pw}" onerror="continue">
+			<classpath>
+				<fileset dir="${db.dir}">
+					<include name="mysql*.jar" />
+				</fileset>
+			</classpath>
+			<transaction src="${db.dir}/initDB.txt" />
+		</sql>
+	</target>
+
+	<target name="emptyTables">
+		<echo message="Emptying tables using: ${db.driver} ${db.url}" />
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pw}">
+			<classpath>
+				<fileset dir="${db.dir}">
+					<include name="mysql*.jar" />
+				</fileset>
+			</classpath>
+			<transaction src="${db.dir}/emptyDB.txt" />
+		</sql>
+	</target>
+
+	<target name="populateTables">
+		<echo message="Populating tables using: ${db.driver} ${db.url}" />
+		<sql driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pw}">
+			<classpath>
+				<fileset dir="${db.dir}">
+					<include name="mysql*.jar" />
+				</fileset>
+			</classpath>
+			<transaction src="${db.dir}/populateDB.txt" />
+		</sql>
+	</target>
+
+	<target name="all" depends="dropMYSQLTables,createMYSQLTables,emptyTables,populateTables" />
+
+</project>

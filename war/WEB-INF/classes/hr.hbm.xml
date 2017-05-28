@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+  - Mapping file for the Hibernate implementation of the HR interface.
+	-->
+<hibernate-mapping default-lazy="false">
+ <class name="hr.obj.Company" table="Company">
+  <id column="ID" name="id">
+   <generator class="identity"/>
+  </id>
+  <property column="Name" generated="never" lazy="false" name="name"/>
+  <set cascade="all" inverse="true" name="vacancies" sort="unsorted">
+   <key column="CompanyID"/>
+   <one-to-many class="hr.obj.Vacancy"/>
+  </set>
+ </class>
+ <class name="hr.obj.Education" table="Education">
+  <id column="ID" name="id">
+   <generator class="identity"/>
+  </id>
+  <property column="Name" generated="never" lazy="false" name="name"/>
+ </class>
+ <class name="hr.obj.Job" table="Job">
+  <id column="ID" name="id">
+   <generator class="identity"/>
+  </id>
+  <property column="Function" generated="never" lazy="false" name="name"/>
+ </class>
+ <class name="hr.obj.JobHunt" table="JobHunt">
+  <composite-id mapped="false" unsaved-value="undefined">
+   <key-many-to-one class="hr.obj.Employee" column="EmployeeID" name="employee"/>
+   <key-many-to-one class="hr.obj.Job" column="JobID" name="job"/>
+  </composite-id>
+  <property column="SalaryMin" generated="never" lazy="false" name="salaryMin"/>
+  <property column="SalaryMax" generated="never" lazy="false" name="salaryMax"/>
+ </class>
+ <class name="hr.obj.JobStory" table="JobStory">
+  <composite-id mapped="false" unsaved-value="undefined">
+   <key-many-to-one class="hr.obj.Employee" column="EmployeeID" name="employee"/>
+   <key-many-to-one class="hr.obj.Company" column="CompanyID" name="company"/>
+   <key-many-to-one class="hr.obj.Job" column="JobID" name="job"/>
+   <key-property column="StartDate" name="startDate" type="date"/>
+  </composite-id>
+  <property column="Salary" generated="never" lazy="false" name="salary"/>
+  <property column="EndDate" generated="never" lazy="false"
+   name="endDate" type="date"/>
+ </class>
+ <class name="hr.obj.Employee" table="Employee">
+  <id column="ID" name="id">
+   <generator class="identity"/>
+  </id>
+  <property column="Name" generated="never" lazy="false" name="name"/>
+  <property column="Surname" generated="never" lazy="false" name="surname"/>
+  <property column="Midname" generated="never" lazy="false" name="midname"/>
+  <property column="Address" generated="never" lazy="false" name="address"/>
+  <many-to-one class="hr.obj.Education" column="EducationID" name="education"/>
+  <set cascade="all" inverse="true" name="jobHunt" sort="unsorted">
+   <key column="EmployeeID"/>
+   <one-to-many class="hr.obj.JobHunt"/>
+  </set>
+  <set cascade="all" inverse="true" name="jobStory" sort="unsorted">
+   <key column="EmployeeID"/>
+   <one-to-many class="hr.obj.JobStory"/>
+  </set>
+ </class>
+ <class name="hr.obj.Vacancy" table="Vacancy">
+  <id column="ID" name="id">
+   <generator class="identity"/>
+  </id>
+  <many-to-one class="hr.obj.Company" column="CompanyID" name="company"/>
+  <many-to-one class="hr.obj.Job" column="JobID" name="job"/>
+  <property column="Salary" generated="never" lazy="false" name="salary"/>
+  <many-to-one class="hr.obj.Education" column="EducationID" name="education"/>
+  <bag cascade="all" inverse="true" name="vacancyReqs">
+   <key column="VacancyID"/>
+   <one-to-many class="hr.obj.VacancyReq"/>
+  </bag>
+ </class>
+ <class name="hr.obj.VacancyReq" table="VacancyReq">
+  <composite-id mapped="false" unsaved-value="undefined">
+   <key-many-to-one class="hr.obj.Vacancy" column="VacancyID" name="vacancy"/>
+   <key-many-to-one class="hr.obj.Job" column="JobID" name="job"/>
+  </composite-id>
+  <property column="ExpMonths" generated="never" lazy="false" name="expMonths"/>
+ </class>
+</hibernate-mapping>

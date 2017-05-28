@@ -1,0 +1,3 @@
+CREATE DATABASE hr;
+
+GRANT ALL PRIVILEGES ON hr.* TO pc@localhost IDENTIFIED BY 'pc';
